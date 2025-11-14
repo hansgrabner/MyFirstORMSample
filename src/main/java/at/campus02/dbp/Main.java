@@ -2,6 +2,7 @@ package at.campus02.dbp;
 
 import at.campus02.dbp.model.Book;
 import at.campus02.dbp.model.FavoriteBook;
+import at.campus02.dbp.model.Kleidungsstueck;
 import at.campus02.dbp.model.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -15,6 +16,11 @@ public class Main {
     private static SessionFactory sessionFactory;
 
     public static void main(String[] args) {
+
+        Book bNeu =new  Book();
+        bNeu.setIsbn("aldjlsdf");
+
+
         // Hibernate SessionFactory erzeugen
         sessionFactory = new Configuration().configure().buildSessionFactory();
 
@@ -40,6 +46,7 @@ public class Main {
         //System.out.println("User: " + getUserWithId_createQuery(1));
         //System.out.println("User: " + getUserWithId_session_get(1));
 
+        /*
         User user1 = getUserWithId_session_get(1);
         Book book1 = getBookWithId_session_get(2);
 
@@ -47,12 +54,18 @@ public class Main {
         listAllFavoriteBooks();
 
 
+*/
+
+        TestKleidungsstuecke();
+
+        KleidungsstueckDAO k = new KleidungsstueckDAO();
+        Kleidungsstueck k1 = new Kleidungsstueck();
+        k1.setBezeichnung("Hose");
+        k1.setFarbe("Blau");
+        k.update(k1);
 
 
-
-
-
-        // SessionFactory schließen
+                // SessionFactory schließen
         sessionFactory.close();
     }
 
@@ -204,6 +217,29 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void TestKleidungsstuecke(){
+
+        KleidungsstueckDAO dao = new KleidungsstueckDAO();
+
+        // CREATE
+        Kleidungsstueck ks = new Kleidungsstueck("Jacke", "Blau");
+        dao.save(ks);
+        System.out.println("Gespeichert: " + ks);
+
+        // READ
+        Kleidungsstueck gefunden = dao.findById(ks.getId());
+        System.out.println("Gefunden: " + gefunden);
+
+        // UPDATE
+        gefunden.setFarbe("Rot");
+        dao.update(gefunden);
+        System.out.println("Aktualisiert: " + dao.findById(gefunden.getId()));
+
+        // DELETE
+        dao.delete(gefunden);
+        System.out.println("Nach dem Löschen: " + dao.findById(gefunden.getId()));
     }
 
 
