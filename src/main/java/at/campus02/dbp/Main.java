@@ -2,6 +2,8 @@ package at.campus02.dbp;
 
 import at.campus02.dbp.model.*;
 import at.campus02.dbp.sampleRelationship.*;
+import at.campus02.dbp.unidirectional.unidirectional_department;
+import at.campus02.dbp.unidirectional.unidrectional_employees;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -24,6 +26,18 @@ public class Main {
         //BeispielUserBooks();
     }
 
+    public static void BeispielUnidieectional(){
+        List<unidrectional_employees> meineEmps =new ArrayList<unidrectional_employees>();
+        unidrectional_employees emp1 =new unidrectional_employees();
+        emp1.setId(1L);
+        emp1.setFirstname("Johann");
+        meineEmps.add(emp1);
+
+        unidirectional_department dep1 =new unidirectional_department();
+        dep1.setDepartmentName("Entwicklung");
+        dep1.setEmployees(meineEmps);
+
+    }
     public static void BeispielSchrank(){
         Schrank s1 =new  Schrank();
         s1.setStandort(Standort.WOHNZIMMER);
@@ -192,6 +206,7 @@ public class Main {
         System.out.println("Mitarbeiter:");
         for (Employee e : ausDb.getEmployees()) {
             System.out.println(" - " + e.getFirstName());
+            //bidirectional - Emp kennt auch sein Department
             System.out.println(" - " + e.getDepartment().getDepartmentName());
 
 
