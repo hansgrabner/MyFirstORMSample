@@ -17,9 +17,10 @@ public class Main {
 
     public static void main(String[] args) {
 
+        BeispielDepartmentEmployees();
         //BeispielKleidngsstuecke();
         //BeispielSchrank();
-        BeispielHQL();
+       // BeispielHQL();
         //BeispielUserBooks();
     }
 
@@ -157,10 +158,11 @@ public class Main {
         List<Employee> mitarbeiter = new ArrayList<>();
         mitarbeiter.add(e1);
         mitarbeiter.add(e2);
+
         d1.setEmployees(mitarbeiter);
 
         DepartmentDAO deptarmentDAO =new DepartmentDAO();
-        // deptarmentDAO.save(d1);
+         deptarmentDAO.save(d1);
 
         Department ausDb = deptarmentDAO.findById(1L);
 
@@ -168,6 +170,7 @@ public class Main {
         System.out.println("Mitarbeiter:");
 
         //Bei Eager
+        /*
         if (ausDb.getEmployees() != null) {
             for (Employee e : ausDb.getEmployees()) {
                 System.out.println(" - " + e.getFirstName() + " (ID: " + e.getId() + ")");
@@ -175,12 +178,13 @@ public class Main {
         } else {
             System.out.println("Keine Mitarbeiter gefunden.");
         }
-
+*/
+        /*
         System.out.println("Mitarbeiter:");
         for (Employee e : ausDb.getEmployees()) {
             System.out.println(" - " + e.getFirstName());
         }
-
+*/
         //ohne Eager
         ausDb = deptarmentDAO.findByIdWithEmployees(1L);
 
@@ -188,6 +192,145 @@ public class Main {
         System.out.println("Mitarbeiter:");
         for (Employee e : ausDb.getEmployees()) {
             System.out.println(" - " + e.getFirstName());
+            System.out.println(" - " + e.getDepartment().getDepartmentName());
+
+
+        }
+    }
+
+        public static void beispielCoursesStudents() {
+
+            // 1) Kurs anlegen
+            ManyCourse kurs1 = new ManyCourse();
+            kurs1.setCourseName("Softwareentwicklung");
+            kurs1.setEcts(6);
+
+            // 2) Students anlegen
+            ManyStudent s1 = new ManyStudent();
+            s1.setFirstName("Anna");
+            s1.setLastName("Muster");
+            s1.setMatriculationNumber("s12345");
+
+            ManyStudent s2 = new ManyStudent();
+            s2.setFirstName("Inna");
+            s2.setLastName("Beispiel");
+            s2.setMatriculationNumber("s67890");
+
+            // 3) Students dem Kurs zuordnen (Owning Side = ManyCourse.students)
+            List<ManyStudent> teilnehmer = new ArrayList<>();
+            teilnehmer.add(s1);
+            teilnehmer.add(s2);
+            kurs1.setStudents(teilnehmer);
+
+            // inverse Seite (optional, aber sauber)
+            List<ManyCourse> kurseS1 = new ArrayList<>();
+            kurseS1.add(kurs1);
+            s1.setCourses(kurseS1);
+
+            List<ManyCourse> kurseS2 = new ArrayList<>();
+            kurseS2.add(kurs1);
+            s2.setCourses(kurseS2);
+
+            // 4) DAO verwenden, um zu speichern
+            ManyCourseStudentDAO dao = new ManyCourseStudentDAO();
+
+            // Wichtig: Owning Side (kurs1) speichern, damit Join-Tabelle befüllt wird
+            dao.saveCourse(kurs1);
+            // (Optional: Students extra speichern – je nach Cascade-Settings)
+            // dao.saveStudent(s1);
+            // dao.saveStudent(s2);
+
+            // 5) Kurs ohne JOIN FETCH laden (nur zur Demo – wie bei deinem Beispiel)
+            ManyCourse kursAusDb = dao.findCourseById(kurs1.getId());
+            System.out.println("Kurs (ohne JOIN FETCH): " + kursAusDb.getCourseName());
+
+            // 6) Kurs MIT Students laden (analog zu findByIdWithEmployees)
+            kursAusDb = dao.findCourseByIdWithStudents(kurs1.getId());
+
+            System.out.println("Kurs: " + kursAusDb.getCourseName());
+            System.out.println("Ects: " + kursAusDb.getEcts());
+            System.out.println("Teilnehmende Studierende:");
+
+            for (ManyStudent s : kursAusDb.getStudents()) {
+                System.out.println(" - " + s.getFirstName() + " " + s.getLastName()
+                        + " (ID: " + s.getId() + ", Matrikelnummer: " + s.getMatriculationNumber() + ")");
+            }
+
+            // 7) Optional: Einen Student inkl. seiner Kurse laden
+            ManyStudent studentAusDb = dao.findStudentByIdWithCourses(s1.getId());
+
+            System.out.println("\nStudent: " + studentAusDb.getFirstName() + " " + studentAusDb.getLastName());
+            System.out.println("Belegte Kurse:");
+            for (ManyCourse c : studentAusDb.getCourses()) {
+                System.out.println(" - " + c.getCourseName() + " (" + c.getEcts() + " ECTS)");
+            }
+        }
+
+    public static void BeispielCoursesStudents() {
+
+        // 1) Kurs anlegen
+        ManyCourse kurs1 = new ManyCourse();
+        kurs1.setCourseName("Softwareentwicklung");
+        kurs1.setEcts(6);
+
+        // 2) Students anlegen
+        ManyStudent s1 = new ManyStudent();
+        s1.setFirstName("Anna");
+        s1.setLastName("Muster");
+        s1.setMatriculationNumber("s12345");
+
+        ManyStudent s2 = new ManyStudent();
+        s2.setFirstName("Inna");
+        s2.setLastName("Beispiel");
+        s2.setMatriculationNumber("s67890");
+
+        // 3) Students dem Kurs zuordnen (Owning Side = ManyCourse.students)
+        List<ManyStudent> teilnehmer = new ArrayList<>();
+        teilnehmer.add(s1);
+        teilnehmer.add(s2);
+        kurs1.setStudents(teilnehmer);
+
+        // inverse Seite (optional, aber sauber)
+        List<ManyCourse> kurseS1 = new ArrayList<>();
+        kurseS1.add(kurs1);
+        s1.setCourses(kurseS1);
+
+        List<ManyCourse> kurseS2 = new ArrayList<>();
+        kurseS2.add(kurs1);
+        s2.setCourses(kurseS2);
+
+        // 4) DAO verwenden, um zu speichern
+        ManyCourseStudentDAO dao = new ManyCourseStudentDAO();
+
+        // Wichtig: Owning Side (kurs1) speichern, damit Join-Tabelle befüllt wird
+        dao.saveCourse(kurs1);
+        // (Optional: Students extra speichern – je nach Cascade-Settings)
+        // dao.saveStudent(s1);
+        // dao.saveStudent(s2);
+
+        // 5) Kurs ohne JOIN FETCH laden (nur zur Demo – wie bei deinem Beispiel)
+        ManyCourse kursAusDb = dao.findCourseById(kurs1.getId());
+        System.out.println("Kurs (ohne JOIN FETCH): " + kursAusDb.getCourseName());
+
+        // 6) Kurs MIT Students laden (analog zu findByIdWithEmployees)
+        kursAusDb = dao.findCourseByIdWithStudents(kurs1.getId());
+
+        System.out.println("Kurs: " + kursAusDb.getCourseName());
+        System.out.println("Ects: " + kursAusDb.getEcts());
+        System.out.println("Teilnehmende Studierende:");
+
+        for (ManyStudent s : kursAusDb.getStudents()) {
+            System.out.println(" - " + s.getFirstName() + " " + s.getLastName()
+                    + " (ID: " + s.getId() + ", Matrikelnummer: " + s.getMatriculationNumber() + ")");
+        }
+
+        // 7) Optional: Einen Student inkl. seiner Kurse laden
+        ManyStudent studentAusDb = dao.findStudentByIdWithCourses(s1.getId());
+
+        System.out.println("\nStudent: " + studentAusDb.getFirstName() + " " + studentAusDb.getLastName());
+        System.out.println("Belegte Kurse:");
+        for (ManyCourse c : studentAusDb.getCourses()) {
+            System.out.println(" - " + c.getCourseName() + " (" + c.getEcts() + " ECTS)");
         }
     }
     public static void BeispielVorlesungStudent(){

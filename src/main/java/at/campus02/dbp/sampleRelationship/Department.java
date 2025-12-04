@@ -38,7 +38,7 @@ public class Department {
     private Long id;
 
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "department_id")
     private List<Employee> employees;
 }

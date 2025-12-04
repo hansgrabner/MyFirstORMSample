@@ -23,5 +23,7 @@
         <mapping class="at.campus02.dbp.sampleRelationship.Employee"/>
         <mapping class="at.campus02.dbp.sampleRelationship.Vorlesung"/>
         <mapping class="at.campus02.dbp.sampleRelationship.Student"/>
+        <mapping class="at.campus02.dbp.sampleRelationship.ManyStudent"/>
+        <mapping class="at.campus02.dbp.sampleRelationship.ManyCourse"/>
     </session-factory>
 </hibernate-configuration>
